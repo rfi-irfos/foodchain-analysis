@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neurobiological-Fitness Consequence Separation v2 — Ana Diez + RFI-IRFOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --cel:        #4A8FD4;
+  --cel-dark:   #1E5FA8;
+  --cel-mid:    #3A7FC4;
+  --cel-light:  #BAD4EE;
+  --cel-pale:   #EEF5FC;
+  --gold:       #D4922A;
+  --gold-pale:  #FDF4E3;
+  --hope:       #2A9A5C;
+  --hope-dark:  #1E7A45;
+  --hope-pale:  #E5F6EE;
+  --white:      #FFFFFF;
+  --navy:       #162840;
+  --text:       #1C2D3E;
+  --muted:      #5A7A98;
+  --border:     #D0DEF0;
+  --danger:     #B83028;
+  --surface:    #F5F8FC;
+  --surface-2:  #EEF3FA;
+  --sidebar-bg: #FAFCFF;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* ── HEADER ──────────────────────────────────────────────────────────────── */
+.header {
+  background: var(--navy);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  padding: 0 24px;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 20px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 2px 12px rgba(22,40,64,.18);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 13px 0;
+}
+
+.flag-accent {
+  width: 4px;
+  align-self: stretch;
+  margin: 8px 0;
+  border-radius: 2px;
+  background: linear-gradient(to bottom, var(--cel) 33%, #fff 33% 66%, var(--cel) 66%);
+  flex-shrink: 0;
+}
+
+.header-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: .01em;
+}
+
+.header-sub {
+  font-size: 10px;
+  color: rgba(255,255,255,.45);
+  margin-top: 1px;
+  font-style: italic;
+  font-family: 'Lora', Georgia, serif;
+}
+
+.header-badge {
+  background: rgba(42,154,92,.18);
+  border: 1px solid rgba(42,154,92,.35);
+  color: #5DD89A;
+  font-size: 9.5px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: .04em;
+  white-space: nowrap;
+  align-self: center;
+}
+
+/* ── TABNAV ──────────────────────────────────────────────────────────────── */
+.tabnav {
+  background: var(--navy);
+  display: flex;
+  padding: 0 24px;
+  gap: 2px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+
+.tabnav button {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 9px 14px;
+  font-family: 'Inter', sans-serif;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: rgba(255,255,255,.45);
+  cursor: pointer;
+  transition: all .15s;
+  margin-bottom: -1px;
+  letter-spacing: .01em;
+}
+
+.tabnav button:hover { color: rgba(255,255,255,.75); }
+.tabnav button.active { color: #fff; border-bottom-color: var(--cel); }
+.tabnav button.hope-tab { }
+.tabnav button.hope-tab:hover { color: rgba(255,255,255,.75); }
+.tabnav button.hope-tab.active { color: #5DD89A; border-bottom-color: var(--hope); }
+
+/* ── LAYOUT ──────────────────────────────────────────────────────────────── */
+.layout { display: flex; min-height: calc(100vh - 100px); }
+
+/* ── SIDEBAR ─────────────────────────────────────────────────────────────── */
+.sidebar {
+  width: 264px;
+  min-width: 264px;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
+  padding: 14px 14px 20px;
+  overflow-y: auto;
+}
+
+.sidebar-section-head {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--muted);
+  margin-bottom: 10px;
+  margin-top: 16px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-section-head:first-child { margin-top: 2px; }
+
+.sidebar-section-head.v2 {
+  color: var(--hope);
+  border-bottom-color: #B3DEC8;
+}
+
+.suff-meter {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 11px 12px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 3px rgba(74,143,212,.06);
+}
+
+.suff-meter .ratio {
+  font-size: 26px;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: -.01em;
+  font-family: 'Inter', sans-serif;
+}
+.suff-meter .ratio.surplus { color: var(--hope); }
+.suff-meter .ratio.deficit { color: var(--danger); }
+.suff-meter .label { font-size: 9.5px; color: var(--muted); text-align: center; margin-top: 2px; }
+.suff-bar-wrap { margin-top: 7px; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.suff-bar { height: 5px; border-radius: 3px; transition: width .45s cubic-bezier(.4,0,.2,1); }
+
+.param-group { margin-bottom: 10px; }
+.param-label { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px; }
+.param-label span { font-size: 11px; color: var(--text); }
+.param-label .val { font-size: 11px; font-weight: 700; color: var(--navy); min-width: 36px; text-align: right; font-variant-numeric: tabular-nums; }
+.param-hint { font-size: 9px; color: var(--muted); margin-top: 2px; }
+
+input[type=range] {
+  width: 100%;
+  accent-color: var(--cel-mid);
+  cursor: pointer;
+  height: 3px;
+  margin: 0;
+}
+input[type=range].hope-range { accent-color: var(--hope); }
+
+.sidebar-sep { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
+
+.btn {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+  margin-bottom: 6px;
+  letter-spacing: .01em;
+}
+.btn:last-child { margin-bottom: 0; }
+.btn-primary { background: var(--cel-mid); color: #fff; }
+.btn-primary:hover { background: var(--cel-dark); }
+.btn-hope { background: var(--hope); color: #fff; }
+.btn-hope:hover { background: var(--hope-dark); }
+.btn-outline {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  font-weight: 500;
+}
+.btn-outline:hover { border-color: var(--cel-mid); color: var(--cel-dark); background: var(--cel-pale); }
+
+/* ── MAIN CONTENT ────────────────────────────────────────────────────────── */
+.main { flex: 1; padding: 18px 20px 80px; overflow-y: auto; min-width: 0; }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(126px, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.stat-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  box-shadow: 0 1px 4px rgba(74,143,212,.05);
+}
+.stat-card .label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.stat-card .value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.02em;
+}
+.stat-card .sub { font-size: 9.5px; color: var(--muted); margin-top: 3px; font-style: italic; }
+.stat-card.hope .value { color: var(--hope); }
+.stat-card.warn .value { color: var(--gold); }
+.stat-card.bad  .value { color: var(--danger); }
+.stat-card.cel  .value { color: var(--cel-dark); }
+
+.charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+
+.chart-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  box-shadow: 0 1px 4px rgba(74,143,212,.05);
+  min-width: 0;
+}
+
+.chart-card h4 {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.chart-card.wide { grid-column: 1 / -1; }
+.chart-wrap { position: relative; height: 190px; }
+.chart-wrap.tall { height: 240px; }
+
+.section-head {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--cel-light);
+  font-family: 'Lora', Georgia, serif;
+}
+.section-head.hope { border-bottom-color: #B3DEC8; color: var(--hope-dark); }
+
+.note {
+  font-size: 11px;
+  color: var(--muted);
+  font-style: italic;
+  background: var(--cel-pale);
+  border-left: 3px solid var(--cel-mid);
+  padding: 8px 12px;
+  border-radius: 0 5px 5px 0;
+  margin-bottom: 16px;
+  line-height: 1.6;
+  font-family: 'Lora', Georgia, serif;
+}
+.note.hope { background: var(--hope-pale); border-left-color: var(--hope); }
+
+/* ── SCENARIO CARDS ──────────────────────────────────────────────────────── */
+.scenario-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 18px; }
+
+.scenario-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 12px;
+  text-align: center;
+  transition: all .2s;
+  box-shadow: 0 1px 3px rgba(74,143,212,.04);
+}
+.scenario-card:hover { border-color: var(--hope); box-shadow: 0 3px 12px rgba(42,154,92,.12); }
+.scenario-card .s-name { font-size: 10px; font-weight: 700; color: var(--navy); margin-bottom: 10px; line-height: 1.35; min-height: 30px; }
+.scenario-card .s-eod { font-size: 24px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.scenario-card .s-hope { font-size: 12.5px; color: var(--hope); font-weight: 600; margin-top: 5px; }
+.scenario-card .s-label { font-size: 9px; color: var(--muted); margin-top: 2px; }
+.scenario-card.best { border-color: var(--hope); background: var(--hope-pale); }
+
+/* ── HOPE METER ──────────────────────────────────────────────────────────── */
+.hope-meter {
+  background: linear-gradient(135deg, var(--hope-pale) 0%, var(--white) 60%);
+  border: 1.5px solid #B3DEC8;
+  border-radius: 10px;
+  padding: 24px 20px;
+  text-align: center;
+  margin-bottom: 18px;
+}
+.hope-meter .big {
+  font-size: 56px;
+  font-weight: 700;
+  color: var(--hope);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.03em;
+}
+.hope-meter .label { font-size: 10.5px; color: var(--muted); margin-top: 5px; font-style: italic; font-family: 'Lora', Georgia, serif; }
+.hope-meter .verdict { font-size: 13px; font-weight: 600; margin-top: 12px; }
+
+/* ── LOADING OVERLAY ─────────────────────────────────────────────────────── */
+.loading {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(22,40,64,.35);
+  backdrop-filter: blur(2px);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 14px;
+}
+.loading.show { display: flex; }
+
+.loading-inner {
+  background: var(--white);
+  border-radius: 12px;
+  padding: 28px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 8px 40px rgba(22,40,64,.2);
+  border: 1px solid var(--border);
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 2.5px solid var(--border);
+  border-top-color: var(--cel-mid);
+  border-radius: 50%;
+  animation: spin .75s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading p { font-size: 12px; color: var(--muted); }
+
+/* ── STATUS BAR ──────────────────────────────────────────────────────────── */
+.statusbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(22,40,64,.96);
+  backdrop-filter: blur(4px);
+  color: rgba(255,255,255,.4);
+  font-size: 10px;
+  padding: 5px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Inter', monospace;
+  letter-spacing: .02em;
+  border-top: 1px solid rgba(255,255,255,.06);
+}
+.statusbar .live { color: var(--cel); font-weight: 600; }
+.statusbar .status-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--hope); margin-right: 5px; animation: pulse 2s ease-in-out infinite; vertical-align: middle; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="flag-accent"></div>
+    <div>
+      <div class="header-title">Neurobiological-Fitness Consequence Separation — v2 Extended</div>
+      <div class="header-sub">Ana Diez (2026) · RFI-IRFOS Distribution Extension · "There is hope if we fix the right things."</div>
+    </div>
+  </div>
+  <div class="header-badge">v2 — Distribution Layer</div>
+</div>
+
+<!-- TAB NAV -->
+<div class="tabnav">
+  <button class="active" onclick="switchTab('sim',this)">Simulation</button>
+  <button onclick="switchTab('policy',this)">Policy Scenarios</button>
+  <button onclick="switchTab('sufficiency',this)">Sufficiency Proof</button>
+  <button class="hope-tab" onclick="switchTab('hope',this)">Hope Index</button>
+  <button onclick="switchTab('bio',this)">Biology</button>
+</div>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="suff-meter">
+    <div class="ratio" id="suff-ratio">—</div>
+    <div class="label">kcal available / minimum</div>
+    <div class="suff-bar-wrap">
+      <div class="suff-bar" id="suff-bar" style="width:0%;background:var(--danger)"></div>
+    </div>
+    <div class="label" style="margin-top:5px" id="suff-label">—</div>
+  </div>
+
+  <div class="sidebar-section-head">Original Parameters</div>
+
+  <div class="param-group">
+    <div class="param-label"><span>Habituation rate</span><span class="val" id="v_hab">1.012</span></div>
+    <input type="range" id="s_hab" min="1.000" max="1.030" step="0.001" value="1.012" oninput="sync('v_hab',this,3);liveSuff()">
+  </div>
+  <div class="param-group">
+    <div class="param-label"><span>Status impulse sens.</span><span class="val" id="v_sip">0.30</span></div>
+    <input type="range" id="s_sip" min="0.05" max="1.00" step="0.01" value="0.30" oninput="sync('v_sip',this,2);liveSuff()">
+  </div>
+  <div class="param-group">
+    <div class="param-label"><span>Anxiety → consumption</span><span class="val" id="v_scc">0.50</span></div>
+    <input type="range" id="s_scc" min="0.05" max="2.00" step="0.05" value="0.50" oninput="sync('v_scc',this,2);liveSuff()">
+  </div>
+  <div class="param-group">
+    <div class="param-label"><span>Resource acquisition</span><span class="val" id="v_rad">0.008</span></div>
+    <input type="range" id="s_rad" min="0.002" max="0.040" step="0.001" value="0.008" oninput="sync('v_rad',this,3);liveSuff()">
+  </div>
+  <div class="param-group">
+    <div class="param-label"><span>Wellbeing prestige</span><span class="val" id="v_wpw">0.50</span></div>
+    <input type="range" id="s_wpw" min="0.00" max="1.00" step="0.05" value="0.50" oninput="sync('v_wpw',this,2);liveSuff()">
+  </div>
+  <div class="param-group">
+    <div class="param-label"><span>Info suppression</span><span class="val" id="v_inf">0.50</span></div>
+    <input type="range" id="s_inf" min="0.00" max="1.50" step="0.05" value="0.50" oninput="sync('v_inf',this,2);liveSuff()">
+  </div>
+  <div class="param-group">
+    <div class="param-label"><span>Ticks (years)</span><span class="val" id="v_tks">150</span></div>
+    <input type="range" id="s_tks" min="54" max="300" step="1" value="150" oninput="sync('v_tks',this,0);liveSuff()">
+  </div>
+
+  <div class="sidebar-section-head v2">Distribution Layer (v2)</div>
+
+  <div class="param-group">
+    <div class="param-label"><span>Policy intervention</span><span class="val" id="v_pol">0.00</span></div>
+    <input type="range" class="hope-range" id="s_pol" min="0.00" max="1.00" step="0.05" value="0.00" oninput="sync('v_pol',this,2);liveSuff()">
+    <div class="param-hint">0 = status quo · 1 = cosmetic rules abolished</div>
+  </div>
+  <div class="param-group">
+    <div class="param-label"><span>Cosmetic waste rate</span><span class="val" id="v_csm">0.20</span></div>
+    <input type="range" id="s_csm" min="0.00" max="0.35" step="0.01" value="0.20" oninput="sync('v_csm',this,2);liveSuff()">
+  </div>
+  <div class="param-group">
+    <div class="param-label"><span>Supply chain waste</span><span class="val" id="v_scw">0.14</span></div>
+    <input type="range" id="s_scw" min="0.02" max="0.30" step="0.01" value="0.14" oninput="sync('v_scw',this,2);liveSuff()">
+  </div>
+  <div class="param-group">
+    <div class="param-label"><span>Consumer waste</span><span class="val" id="v_cnw">0.17</span></div>
+    <input type="range" id="s_cnw" min="0.02" max="0.35" step="0.01" value="0.17" oninput="sync('v_cnw',this,2);liveSuff()">
+  </div>
+  <div class="param-group">
+    <div class="param-label"><span>Distribution equity</span><span class="val" id="v_deq">0.60</span></div>
+    <input type="range" class="hope-range" id="s_deq" min="0.10" max="1.00" step="0.05" value="0.60" oninput="sync('v_deq',this,2);liveSuff()">
+    <div class="param-hint">0.1 = feudal · 1.0 = fully equal</div>
+  </div>
+
+  <hr class="sidebar-sep">
+  <button class="btn btn-primary" onclick="runSim()">Run Simulation</button>
+  <button class="btn btn-hope"    onclick="runScenarios()">Run All Scenarios</button>
+  <button class="btn btn-outline" onclick="resetParams()">Reset Defaults</button>
+  <button class="btn btn-outline" onclick="exportCSV()">Export CSV</button>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- TAB: SIMULATION -->
+<div id="tab-sim" class="tab-pane active">
+  <div class="stats-row" id="sim-stats">
+    <div class="stat-card cel"><div class="label">Final EOD</div><div class="value" id="s-eod">—</div><div class="sub">day of year</div></div>
+    <div class="stat-card warn"><div class="label">RMSE (54y)</div><div class="value" id="s-rmse">—</div><div class="sub">days · Ana's: 5.64</div></div>
+    <div class="stat-card bad"><div class="label">Consequence Sep.</div><div class="value" id="s-cs">—</div><div class="sub">final tick mean</div></div>
+    <div class="stat-card"><div class="label">Repro. physiology</div><div class="value" id="s-rp">—</div><div class="sub">final</div></div>
+    <div class="stat-card hope"><div class="label">Hope Index</div><div class="value" id="s-hope">—</div><div class="sub">dist_eff × equity × repro</div></div>
+    <div class="stat-card"><div class="label">Dist. efficiency</div><div class="value" id="s-dist">—</div><div class="sub">fraction reaching agents</div></div>
+  </div>
+  <div class="charts-grid">
+    <div class="chart-card wide"><h4>Earth Overshoot Day — Simulated vs. Empirical</h4><div class="chart-wrap tall"><canvas id="c-eod"></canvas></div></div>
+    <div class="chart-card"><h4>Consequence Separation</h4><div class="chart-wrap"><canvas id="c-cs"></canvas></div></div>
+    <div class="chart-card"><h4>Reproductive Physiology</h4><div class="chart-wrap"><canvas id="c-rp"></canvas></div></div>
+    <div class="chart-card"><h4>Hope Index over time</h4><div class="chart-wrap"><canvas id="c-hope"></canvas></div></div>
+    <div class="chart-card"><h4>Distribution Efficiency over time</h4><div class="chart-wrap"><canvas id="c-dist"></canvas></div></div>
+  </div>
+</div>
+
+<!-- TAB: POLICY SCENARIOS -->
+<div id="tab-policy" class="tab-pane">
+  <h2 class="section-head">Policy Scenarios — What Actually Moves the Needle?</h2>
+  <div class="note">5 scenarios from status quo to full reform. Each holds neurobiological parameters constant — only distribution policy changes.</div>
+  <button class="btn btn-hope" onclick="runScenarios()" style="max-width:240px;margin-bottom:18px">Run All 5 Scenarios</button>
+  <div class="scenario-grid" id="scenario-cards"></div>
+  <div class="charts-grid" id="scenario-charts" style="display:none">
+    <div class="chart-card wide"><h4>EOD Trajectory — all scenarios</h4><div class="chart-wrap tall"><canvas id="sc-eod"></canvas></div></div>
+    <div class="chart-card"><h4>Consequence Separation — all scenarios</h4><div class="chart-wrap"><canvas id="sc-cs"></canvas></div></div>
+    <div class="chart-card"><h4>Reproductive Physiology — all scenarios</h4><div class="chart-wrap"><canvas id="sc-rp"></canvas></div></div>
+    <div class="chart-card"><h4>Hope Index — all scenarios</h4><div class="chart-wrap"><canvas id="sc-hope"></canvas></div></div>
+  </div>
+</div>
+
+<!-- TAB: SUFFICIENCY PROOF -->
+<div id="tab-sufficiency" class="tab-pane">
+  <h2 class="section-head">The Sufficiency Proof — Earth Is Not Full</h2>
+  <div class="note">Move the sliders to see the live calculation. The question is not whether we produce enough — we produce 1.64× the minimum. The question is how much we destroy before it reaches anyone.</div>
+  <div class="stats-row" id="suff-stats">
+    <div class="stat-card"><div class="label">Produced (farm level)</div><div class="value" style="color:var(--cel-dark)">2,950</div><div class="sub">kcal/person/day (FAO 2022)</div></div>
+    <div class="stat-card"><div class="label">WHO minimum</div><div class="value" style="color:var(--navy)">1,800</div><div class="sub">kcal/person/day</div></div>
+    <div class="stat-card"><div class="label">Production surplus</div><div class="value" style="color:var(--hope)">1.64×</div><div class="sub">before any waste</div></div>
+    <div class="stat-card"><div class="label">Total waste (current)</div><div class="value" style="color:var(--danger)" id="suff-waste-pct">42.9%</div><div class="sub">of all food produced</div></div>
+    <div class="stat-card"><div class="label">Available after waste</div><div class="value" id="suff-avail-ratio" style="color:var(--danger)">0.94×</div><div class="sub">below WHO minimum</div></div>
+    <div class="stat-card hope"><div class="label">People feedable (peak pop)</div><div class="value" id="suff-feedable">—</div><div class="sub">billion at 2080 peak</div></div>
+  </div>
+  <div class="charts-grid">
+    <div class="chart-card wide">
+      <h4>Sufficiency ratio vs. policy intervention — live</h4>
+      <div class="chart-wrap"><canvas id="suff-policy-chart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h4>Where the food goes (current settings)</h4>
+      <div class="chart-wrap"><canvas id="suff-pie"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h4>Population headroom at different waste scenarios</h4>
+      <div class="chart-wrap"><canvas id="suff-pop-chart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: HOPE INDEX -->
+<div id="tab-hope" class="tab-pane">
+  <h2 class="section-head hope">The Hope Index</h2>
+  <div class="note hope">Hope = distribution efficiency × equity × reproductive health. This is what changes when you fix policy. The neurobiological separation remains — but the physiological consequences can be contained.</div>
+  <div class="hope-meter" id="hope-meter">
+    <div class="big" id="hope-big">—</div>
+    <div class="label">current hope index (0 = total collapse · 1 = thriving)</div>
+    <div class="verdict" id="hope-verdict">run a simulation first</div>
+  </div>
+  <div class="note hope" id="hope-message" style="display:none"></div>
+  <div class="charts-grid" id="hope-charts" style="display:none">
+    <div class="chart-card wide"><h4>Hope Index — across all 5 policy scenarios</h4><div class="chart-wrap tall"><canvas id="hope-scenarios-chart"></canvas></div></div>
+    <div class="chart-card"><h4>Hope vs. Consequence Separation (tradeoff space)</h4><div class="chart-wrap"><canvas id="hope-vs-cs-chart"></canvas></div></div>
+    <div class="chart-card"><h4>What drives hope — parameter contribution</h4><div class="chart-wrap"><canvas id="hope-drivers-chart"></canvas></div></div>
+  </div>
+</div>
+
+<!-- TAB: BIOLOGY -->
+<div id="tab-bio" class="tab-pane">
+  <h2 class="section-head">Biological Pathways</h2>
+  <div class="note">HPA-HPG stress axis vs. EDC chemical accumulation. The neurobiological mechanism persists regardless of distribution policy — but its magnitude changes.</div>
+  <button class="btn btn-primary" onclick="runBio()" style="max-width:220px;margin-bottom:18px">Run Pathway Analysis</button>
+  <div class="charts-grid" id="bio-charts" style="display:none">
+    <div class="chart-card"><h4>Dopamine Loop Closure vs. Real Satisfaction</h4><div class="chart-wrap"><canvas id="bio-dlc"></canvas></div></div>
+    <div class="chart-card"><h4>Consequence Separation decomposed</h4><div class="chart-wrap"><canvas id="bio-cs"></canvas></div></div>
+    <div class="chart-card"><h4>Synaptic Habituation growth</h4><div class="chart-wrap"><canvas id="bio-sh"></canvas></div></div>
+    <div class="chart-card"><h4>Fertility intention vs. Repro. physiology</h4><div class="chart-wrap"><canvas id="bio-fert"></canvas></div></div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<div class="loading" id="loading">
+  <div class="loading-inner">
+    <div class="spinner"></div>
+    <p id="loading-msg">Running…</p>
+  </div>
+</div>
+
+<div class="statusbar">
+  <span id="status-left"><span class="status-dot"></span>Ready</span>
+  <span class="live">localhost:8766 · v2</span>
+</div>
+
+<script>
+const C = {
+  cel:    "#3A7FC4",
+  gold:   "#D4922A",
+  navy:   "#162840",
+  hope:   "#2A9A5C",
+  red:    "#B83028",
+  grey:   "#8FA8C0",
+  cel_a:  "rgba(58,127,196,.12)",
+  hope_a: "rgba(42,154,92,.12)",
+  gold_a: "rgba(212,146,42,.15)",
+};
+const SCENARIO_COLORS = ["#B83028","#D4922A","#D4C22A","#3A7FC4","#2A9A5C"];
+
+// ── Chart registry — update in-place, never destroy/recreate ─────────────────
+// This is what keeps the browser static on re-run: charts update their data
+// without tearing down and rebuilding DOM, so scroll position and layout are
+// completely preserved between runs.
+const charts = {};
+
+function setOrUpdate(id, config) {
+  if (charts[id]) {
+    charts[id].data = config.data;
+    if (config.options?.scales) {
+      Object.assign(charts[id].options.scales, config.options.scales);
+    }
+    charts[id].update('none');  // 'none' = instant, no animation flash
+  } else {
+    charts[id] = new Chart(document.getElementById(id), config);
+  }
+}
+
+const baseOpts = (yLabel = "") => ({
+  responsive: true,
+  maintainAspectRatio: false,
+  animation: { duration: 300 },
+  plugins: {
+    legend: {
+      labels: {
+        font: { family: "'Inter', sans-serif", size: 10 },
+        color: "#5A7A98",
+        boxWidth: 10,
+        padding: 12,
+      }
+    },
+    tooltip: {
+      bodyFont: { family: "'Inter', sans-serif", size: 10 },
+      titleFont: { family: "'Inter', sans-serif", size: 10, weight: '600' },
+      backgroundColor: "rgba(22,40,64,.92)",
+      borderColor: "rgba(255,255,255,.1)",
+      borderWidth: 1,
+      padding: 8,
+    }
+  },
+  scales: {
+    x: {
+      ticks: { font: { family: "'Inter', sans-serif", size: 9 }, color: "#5A7A98", maxTicksLimit: 10 },
+      grid: { color: "rgba(100,150,200,.08)" },
+    },
+    y: {
+      title: { display: !!yLabel, text: yLabel, font: { family: "'Inter', sans-serif", size: 9 }, color: "#5A7A98" },
+      ticks: { font: { family: "'Inter', sans-serif", size: 9 }, color: "#5A7A98" },
+      grid: { color: "rgba(100,150,200,.08)" },
+    }
+  }
+});
+
+function switchTab(name, btn) {
+  document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".tabnav button").forEach(b => b.classList.remove("active"));
+  document.getElementById("tab-" + name).classList.add("active");
+  btn.classList.add("active");
+}
+
+function sync(vid, el, decimals) {
+  document.getElementById(vid).textContent = parseFloat(el.value).toFixed(decimals);
+}
+
+function getParams() {
+  return {
+    base_habituation_rate:           parseFloat(document.getElementById("s_hab").value),
+    base_status_impulse_sensitivity: parseFloat(document.getElementById("s_sip").value),
+    status_consumption_conversion:   parseFloat(document.getElementById("s_scc").value),
+    resource_acquisition_drive:      parseFloat(document.getElementById("s_rad").value),
+    wellbeing_prestige_weight:       parseFloat(document.getElementById("s_wpw").value),
+    info_suppression:                parseFloat(document.getElementById("s_inf").value),
+    n_ticks:                         parseInt(document.getElementById("s_tks").value),
+    policy_intervention:             parseFloat(document.getElementById("s_pol").value),
+    cosmetic_waste_rate:             parseFloat(document.getElementById("s_csm").value),
+    supply_chain_waste_rate:         parseFloat(document.getElementById("s_scw").value),
+    consumer_waste_rate:             parseFloat(document.getElementById("s_cnw").value),
+    distribution_equity:             parseFloat(document.getElementById("s_deq").value),
+  };
+}
+
+function resetParams() {
+  const defs = { s_hab:"1.012", s_sip:"0.30", s_scc:"0.50", s_rad:"0.008", s_wpw:"0.50",
+                 s_inf:"0.50",  s_tks:"150",  s_pol:"0.00", s_csm:"0.20", s_scw:"0.14",
+                 s_cnw:"0.17",  s_deq:"0.60" };
+  const vids = { s_hab:"v_hab", s_sip:"v_sip", s_scc:"v_scc", s_rad:"v_rad", s_wpw:"v_wpw",
+                 s_inf:"v_inf", s_tks:"v_tks", s_pol:"v_pol", s_csm:"v_csm", s_scw:"v_scw",
+                 s_cnw:"v_cnw", s_deq:"v_deq" };
+  const decs = { s_hab:3, s_sip:2, s_scc:2, s_rad:3, s_wpw:2, s_inf:2, s_tks:0,
+                 s_pol:2, s_csm:2, s_scw:2, s_cnw:2, s_deq:2 };
+  Object.entries(defs).forEach(([id, val]) => {
+    document.getElementById(id).value = val;
+    document.getElementById(vids[id]).textContent = parseFloat(val).toFixed(decs[id]);
+  });
+  liveSuff();
+}
+
+function setLoading(msg) {
+  document.getElementById("loading").classList.add("show");
+  document.getElementById("loading-msg").textContent = msg;
+}
+function clearLoading() { document.getElementById("loading").classList.remove("show"); }
+function setStatus(msg) { document.getElementById("status-left").innerHTML = '<span class="status-dot"></span>' + msg; }
+
+// When opened as a local file (file://), resolve API calls to the running Python server
+const API_BASE = location.protocol === 'file:' ? 'http://localhost:8766' : '';
+
+async function post(ep, body = {}) {
+  const r = await fetch(API_BASE + ep, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+
+// Live sufficiency meter (no server)
+async function liveSuff() {
+  const p = getParams();
+  try {
+    const s = await post("/sufficiency", { params: p });
+    updateSuffMeter(s);
+  } catch(e) {}
+}
+
+function updateSuffMeter(s) {
+  const ratio = s.ratio_after_waste;
+  const el = document.getElementById("suff-ratio");
+  el.textContent = ratio.toFixed(2) + "×";
+  el.className = "ratio " + (s.in_surplus ? "surplus" : "deficit");
+  const bar = document.getElementById("suff-bar");
+  bar.style.width = Math.min(100, ratio * 100 / 1.6) + "%";
+  bar.style.background = s.in_surplus ? "var(--hope)" : "var(--danger)";
+  document.getElementById("suff-label").textContent = s.in_surplus
+    ? `surplus — feeds ${s.pop_feedable_billions}B at peak pop`
+    : `deficit — ${s.total_waste_pct}% waste manufactured this`;
+  const wp = document.getElementById("suff-waste-pct");
+  if (wp) wp.textContent = s.total_waste_pct + "%";
+  const ar = document.getElementById("suff-avail-ratio");
+  if (ar) { ar.textContent = ratio.toFixed(3) + "×"; ar.style.color = s.in_surplus ? "var(--hope)" : "var(--danger)"; }
+  const sf = document.getElementById("suff-feedable");
+  if (sf) sf.textContent = s.pop_feedable_billions + "B";
+}
+
+// ── SIMULATION ────────────────────────────────────────────────────────────────
+async function runSim() {
+  setLoading("Running simulation…");
+  try {
+    const d = await post("/run", { params: getParams() });
+    renderSim(d);
+    updateSuffMeter(d.stats.sufficiency);
+    updateHopeMeter(d.stats.final_hope);
+    setStatus(`EOD ${d.stats.final_eod} · Hope ${d.stats.final_hope.toFixed(3)} · RMSE ${d.stats.abc_rmse_54ticks.toFixed(2)}`);
+  } catch(e) { alert("Error: " + e.message); }
+  clearLoading();
+}
+
+function renderSim(d) {
+  const s = d.stats;
+  document.getElementById("s-eod").textContent  = Math.round(d.eod[d.eod.length - 1]);
+  document.getElementById("s-rmse").textContent = s.abc_rmse_54ticks.toFixed(2);
+  document.getElementById("s-cs").textContent   = s.final_cs.toFixed(3);
+  document.getElementById("s-rp").textContent   = s.final_repro.toFixed(3);
+  document.getElementById("s-hope").textContent = s.final_hope.toFixed(3);
+  document.getElementById("s-dist").textContent = s.final_dist_eff.toFixed(3);
+
+  const L = d.year;
+
+  setOrUpdate("c-eod", { type:"line", data:{ labels:L, datasets:[
+    { label:"Simulated EOD",  data:d.eod,          borderColor:C.cel,  borderWidth:2, pointRadius:0, tension:.3 },
+    { label:"Empirical (GFN)",data:d.eod_empirical, borderColor:C.grey, borderWidth:1.5, borderDash:[5,3], pointRadius:0 },
+  ]}, options:baseOpts("day of year") });
+
+  setOrUpdate("c-cs", { type:"line", data:{ labels:L, datasets:[
+    { label:"CS mean",       data:d.cs_mean,            borderColor:C.red,  backgroundColor:C.hope_a, fill:"origin", borderWidth:2, pointRadius:0, tension:.3 },
+    { label:"Dist. CS gap",  data:d.distribution_cs_gap, borderColor:C.hope, borderWidth:1.5, borderDash:[4,3], pointRadius:0 },
+  ]}, options:baseOpts("consequence_separation") });
+
+  setOrUpdate("c-rp", { type:"line", data:{ labels:L, datasets:[
+    { label:"Repro. physiology", data:d.repro_mean, borderColor:C.gold, backgroundColor:C.gold_a, fill:"origin", borderWidth:2, pointRadius:0, tension:.3 },
+  ]}, options:baseOpts("reproductive_physiology") });
+
+  setOrUpdate("c-hope", { type:"line", data:{ labels:L, datasets:[
+    { label:"Hope index", data:d.hope_index, borderColor:C.hope, backgroundColor:C.hope_a, fill:"origin", borderWidth:2.5, pointRadius:0, tension:.3 },
+  ]}, options:baseOpts("hope index") });
+
+  setOrUpdate("c-dist", { type:"line", data:{ labels:L, datasets:[
+    { label:"Distribution efficiency", data:d.distribution_efficiency, borderColor:C.cel, borderWidth:2, pointRadius:0, tension:.3 },
+  ]}, options:baseOpts("fraction") });
+}
+
+// ── SCENARIOS ─────────────────────────────────────────────────────────────────
+let scenarioData = null;
+async function runScenarios() {
+  setLoading("Running 5 policy scenarios…");
+  try {
+    const d = await post("/scenarios", { n_ticks: 150 });
+    scenarioData = d;
+    renderScenarios(d);
+    setStatus(`5 scenarios complete`);
+  } catch(e) { alert("Error: " + e.message); }
+  clearLoading();
+}
+
+function renderScenarios(d) {
+  const sc = d.scenarios;
+  const cardsEl = document.getElementById("scenario-cards");
+  cardsEl.innerHTML = "";
+  const bestHope = Math.max(...sc.map(s => s.stats.final_hope));
+
+  sc.forEach((s, i) => {
+    const isBest = s.stats.final_hope === bestHope;
+    const eod = Math.round(s.eod[s.eod.length - 1]);
+    const card = document.createElement("div");
+    card.className = "scenario-card" + (isBest ? " best" : "");
+    card.innerHTML = `
+      <div class="s-name">${s.name}</div>
+      <div class="s-eod" style="color:${SCENARIO_COLORS[i]}">${eod}</div>
+      <div class="s-label">Final EOD (day)</div>
+      <div class="s-hope">Hope ${s.stats.final_hope.toFixed(3)}</div>
+      <div class="s-label">${s.sufficiency.ratio_after_waste.toFixed(2)}× kcal sufficiency</div>
+    `;
+    cardsEl.appendChild(card);
+  });
+
+  document.getElementById("scenario-charts").style.display = "grid";
+  const L = sc[0].year;
+
+  const mkDatasets = (key) => sc.map((s, i) => ({
+    label: s.name, data: s[key], borderColor: SCENARIO_COLORS[i],
+    borderWidth: 2, pointRadius: 0, tension: .3,
+    borderDash: i === 0 ? [5, 3] : [],
+  }));
+
+  setOrUpdate("sc-eod",  { type:"line", data:{ labels:L, datasets:mkDatasets("eod") },        options:baseOpts("EOD") });
+  setOrUpdate("sc-cs",   { type:"line", data:{ labels:L, datasets:mkDatasets("cs_mean") },     options:baseOpts("CS") });
+  setOrUpdate("sc-rp",   { type:"line", data:{ labels:L, datasets:mkDatasets("repro_mean") },  options:baseOpts("repro") });
+  setOrUpdate("sc-hope", { type:"line", data:{ labels:L, datasets:mkDatasets("hope_index") },  options:baseOpts("hope") });
+
+  renderHopeFromScenarios(sc, L);
+}
+
+// ── SUFFICIENCY TAB ───────────────────────────────────────────────────────────
+function renderSufficiencyCharts() {
+  const policies = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1.0];
+  const cosmetic  = parseFloat(document.getElementById("s_csm").value);
+  const supply    = parseFloat(document.getElementById("s_scw").value);
+  const consumer  = parseFloat(document.getElementById("s_cnw").value);
+  const ratios    = policies.map(p => {
+    const eff = cosmetic * (1 - p);
+    const tw  = 1 - (1 - supply) * (1 - eff) * (1 - consumer);
+    return +(2950 * (1 - tw) / 1800).toFixed(3);
+  });
+
+  setOrUpdate("suff-policy-chart", {
+    type: "line",
+    data: { labels: policies.map(p => (p * 100).toFixed(0) + "%"), datasets: [
+      { label:"Sufficiency ratio", data:ratios, borderColor:C.hope, backgroundColor:C.hope_a,
+        fill:"origin", borderWidth:2.5, pointRadius:3, tension:.3 },
+      { label:"Minimum (1.0×)",   data:policies.map(() => 1.0), borderColor:C.red,
+        borderWidth:1.5, borderDash:[5,3], pointRadius:0 },
+    ]},
+    options: { ...baseOpts("kcal available / minimum"), scales: { ...baseOpts().scales,
+      y: { ...baseOpts().scales.y, min: 0.7, max: 1.8 } } }
+  });
+
+  const tw    = 1 - (1 - supply) * (1 - cosmetic * (1 - parseFloat(document.getElementById("s_pol").value))) * (1 - consumer);
+  const avail = +(1 - tw).toFixed(3);
+
+  setOrUpdate("suff-pie", {
+    type: "doughnut",
+    data: { labels:["Reaches people","Supply chain loss","Cosmetic rejects","Consumer waste"],
+      datasets:[{ data:[Math.round(avail*100), Math.round(supply*100),
+                        Math.round(cosmetic*(1-parseFloat(document.getElementById("s_pol").value))*100),
+                        Math.round(consumer*100)],
+        backgroundColor:[C.hope,"#D4922A",C.red,C.gold],
+        borderWidth:2, borderColor:"#fff" }] },
+    options: { responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ labels:{ font:{ family:"'Inter', sans-serif", size:10 }, boxWidth:10 } } } }
+  });
+
+  const wasteScens = [0.43, 0.30, 0.20, 0.10, 0.05];
+  const scLabels   = ["Current (43%)","30% waste","20% waste","10% waste","5% waste"];
+  const popFeed    = wasteScens.map(w => +((2950*(1-w)/1800*8.1)).toFixed(1));
+
+  setOrUpdate("suff-pop-chart", {
+    type: "bar",
+    data: { labels: scLabels, datasets: [
+      { label:"People feedable (B)", data:popFeed,
+        backgroundColor:popFeed.map(p => p >= 8.1 ? C.hope : C.red), borderRadius:4 },
+      { label:"Current population (8.1B)", data:scLabels.map(() => 8.1),
+        type:"line", borderColor:C.navy, borderWidth:2, borderDash:[5,3], pointRadius:0 },
+    ]},
+    options: { ...baseOpts("billion people"), plugins: { ...baseOpts().plugins, legend: { display:true } } }
+  });
+}
+
+// ── HOPE TAB ──────────────────────────────────────────────────────────────────
+function updateHopeMeter(hope) {
+  const el = document.getElementById("hope-big");
+  el.textContent = (hope * 100).toFixed(1) + "%";
+  el.style.color = hope > 0.4 ? "var(--hope)" : hope > 0.2 ? "var(--gold)" : "var(--danger)";
+  const verdicts = [
+    [0.6, "the system is working. keep going."],
+    [0.4, "significant headroom exists — policy can close this gap."],
+    [0.2, "distribution reform can still turn this around."],
+    [0.0, "collapse trajectory — but the numbers show a way out."],
+  ];
+  const v = verdicts.find(([t]) => hope >= t);
+  const vEl = document.getElementById("hope-verdict");
+  vEl.textContent = v ? v[1] : "";
+  vEl.style.color = hope > 0.4 ? "var(--hope)" : hope > 0.2 ? "var(--gold)" : "var(--danger)";
+}
+
+function renderHopeFromScenarios(sc, L) {
+  document.getElementById("hope-charts").style.display = "grid";
+  const msgEl = document.getElementById("hope-message");
+  msgEl.style.display = "block";
+  const best  = sc[sc.length - 1];
+  const worst = sc[0];
+  const gain  = ((best.stats.final_hope / worst.stats.final_hope - 1) * 100).toFixed(0);
+  msgEl.textContent = `Full reform improves hope by ${gain}% vs. status quo. The neurobiological separation persists — `
+    + `but physiological collapse is not inevitable. Distribution is the lever.`;
+
+  setOrUpdate("hope-scenarios-chart", {
+    type: "line",
+    data: { labels:L, datasets:sc.map((s, i) => ({
+      label: s.name, data: s.hope_index, borderColor: SCENARIO_COLORS[i],
+      borderWidth: 2.5, pointRadius: 0, tension: .3,
+      fill: i === sc.length - 1 ? "origin" : false,
+      backgroundColor: i === sc.length - 1 ? "rgba(42,154,92,.08)" : "transparent",
+    })) },
+    options: baseOpts("hope index")
+  });
+
+  setOrUpdate("hope-vs-cs-chart", {
+    type: "scatter",
+    data: { datasets: sc.map((s, i) => ({
+      label: s.name,
+      data: s.hope_index.map((h, j) => ({ x: s.cs_mean[j], y: h })),
+      borderColor: SCENARIO_COLORS[i],
+      backgroundColor: SCENARIO_COLORS[i] + "44",
+      pointRadius: 2,
+    })) },
+    options: baseOpts("hope index")
+  });
+
+  setOrUpdate("hope-drivers-chart", {
+    type: "bar",
+    data: { labels: sc.map(s => s.name), datasets: [
+      { label:"Dist. efficiency", data:sc.map(s => s.stats.final_dist_eff || 0), backgroundColor:C.cel, borderRadius:3 },
+      { label:"Hope index",       data:sc.map(s => s.stats.final_hope),           backgroundColor:C.hope, borderRadius:3 },
+    ]},
+    options: { ...baseOpts("value"), indexAxis:"y",
+      plugins: { ...baseOpts().plugins, legend: { display:true } } }
+  });
+}
+
+// ── BIOLOGY TAB ───────────────────────────────────────────────────────────────
+async function runBio() {
+  setLoading("Running pathway analysis…");
+  try {
+    const d = await post("/run", { params: getParams() });
+    document.getElementById("bio-charts").style.display = "grid";
+    const L = d.year;
+
+    setOrUpdate("bio-dlc", { type:"line", data:{ labels:L, datasets:[
+      { label:"Dopamine loop closure", data:d.dlc_mean,  borderColor:C.cel,  borderWidth:2, pointRadius:0, tension:.3 },
+      { label:"Real satisfaction (RSR)",data:d.rsr,      borderColor:C.hope, borderWidth:2, borderDash:[4,3], pointRadius:0 },
+    ]}, options:baseOpts("reward signal") });
+
+    setOrUpdate("bio-cs", { type:"line", data:{ labels:L, datasets:[
+      { label:"Total CS",           data:d.cs_mean,            borderColor:C.red,  borderWidth:2, pointRadius:0, tension:.3 },
+      { label:"Distribution CS gap",data:d.distribution_cs_gap, borderColor:C.gold, borderWidth:2, borderDash:[4,3], pointRadius:0 },
+    ]}, options:baseOpts("separation") });
+
+    setOrUpdate("bio-sh", { type:"line", data:{ labels:L, datasets:[
+      { label:"Synaptic habituation (mean)", data:d.sh_mean, borderColor:C.navy, borderWidth:2, pointRadius:0, tension:.3 },
+    ]}, options:baseOpts("× baseline") });
+
+    setOrUpdate("bio-fert", { type:"line", data:{ labels:L, datasets:[
+      { label:"Fertility intention",    data:d.fertility_mean, borderColor:C.gold, borderWidth:2, pointRadius:0, tension:.3 },
+      { label:"Reproductive physiology",data:d.repro_mean,    borderColor:C.red,  borderWidth:2, borderDash:[4,3], pointRadius:0 },
+    ]}, options:baseOpts("0–1") });
+
+    setStatus("Biology analysis complete");
+  } catch(e) { alert("Error: " + e.message); }
+  clearLoading();
+}
+
+// ── EXPORT ────────────────────────────────────────────────────────────────────
+async function exportCSV() {
+  setLoading("Exporting…");
+  const res = await fetch("/export", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ params:getParams() }) });
+  const blob = await res.blob();
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href = url; a.download = "ana_diez_sim_v2.csv"; a.click();
+  URL.revokeObjectURL(url);
+  clearLoading();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+window.addEventListener("load", () => {
+  liveSuff();
+  renderSufficiencyCharts();
+  runSim();
+});
+
+["s_pol","s_csm","s_scw","s_cnw","s_deq"].forEach(id => {
+  document.getElementById(id).addEventListener("input", renderSufficiencyCharts);
+});
+</script>
+</body>
+</html>

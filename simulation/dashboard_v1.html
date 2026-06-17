@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neurobiological-Fitness Consequence Separation — Ana Diez</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+/* ── Argentina palette ─────────────────────────────────────── */
+:root {
+  --cel:       #74ACDF;   /* celeste — flag sky blue */
+  --cel-dark:  #2E6DB4;
+  --cel-mid:   #4A90D9;
+  --cel-light: #C8E0F4;
+  --cel-pale:  #EBF5FB;
+  --gold:      #F5A623;
+  --gold-pale: #FEF3DC;
+  --white:     #FFFFFF;
+  --navy:      #1A3A5C;
+  --text:      #1A2B3E;
+  --muted:     #5A7A9A;
+  --border:    #C5DDF0;
+  --success:   #27AE60;
+  --warn:      #E67E22;
+  --danger:    #C0392B;
+  --surface:   #F7FBFF;
+  --card:      #FFFFFF;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "Palatino Linotype", Palatino, Georgia, serif;
+  background: var(--surface);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ── Flag stripe header ───────────────────────────────────── */
+.flag-stripe {
+  height: 6px;
+  background: linear-gradient(to right,
+    var(--cel) 0%, var(--cel) 33%,
+    var(--white) 33%, var(--white) 66%,
+    var(--cel) 66%, var(--cel) 100%);
+}
+
+/* ── Top bar ──────────────────────────────────────────────── */
+.topbar {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 1px 4px rgba(46,109,180,.08);
+}
+.topbar-title h1 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--navy);
+  letter-spacing: .01em;
+}
+.topbar-title p {
+  font-size: 11px;
+  color: var(--muted);
+  font-style: italic;
+  margin-top: 1px;
+}
+.topbar-badge {
+  background: var(--cel-pale);
+  border: 1px solid var(--cel-light);
+  color: var(--cel-dark);
+  font-size: 10px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-style: italic;
+}
+
+/* ── Tab nav ──────────────────────────────────────────────── */
+.tabnav {
+  background: var(--white);
+  border-bottom: 2px solid var(--border);
+  display: flex;
+  padding: 0 28px;
+  gap: 2px;
+}
+.tabnav button {
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: 10px 18px;
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+  margin-bottom: -2px;
+  transition: all .15s;
+}
+.tabnav button:hover { color: var(--cel-dark); }
+.tabnav button.active {
+  color: var(--cel-dark);
+  border-bottom-color: var(--cel-mid);
+  font-weight: 600;
+}
+
+/* ── Layout ───────────────────────────────────────────────── */
+.layout {
+  display: flex;
+  gap: 0;
+  min-height: calc(100vh - 100px);
+}
+
+/* ── Sidebar ──────────────────────────────────────────────── */
+.sidebar {
+  width: 270px;
+  min-width: 270px;
+  background: var(--white);
+  border-right: 1px solid var(--border);
+  padding: 18px 16px;
+  overflow-y: auto;
+}
+.sidebar h3 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 14px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.param-group { margin-bottom: 14px; }
+.param-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+.param-label span {
+  font-size: 11px;
+  color: var(--text);
+}
+.param-label code {
+  font-family: "Courier New", monospace;
+  font-size: 10px;
+  color: var(--cel-dark);
+  background: var(--cel-pale);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+.param-label .val {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--navy);
+  min-width: 42px;
+  text-align: right;
+}
+input[type=range] {
+  width: 100%;
+  accent-color: var(--cel-mid);
+  cursor: pointer;
+  height: 3px;
+}
+.sidebar-sep {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 16px 0;
+}
+.btn {
+  display: block;
+  width: 100%;
+  padding: 9px 12px;
+  border: none;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+  margin-bottom: 8px;
+}
+.btn-primary {
+  background: var(--cel-mid);
+  color: var(--white);
+}
+.btn-primary:hover { background: var(--cel-dark); }
+.btn-outline {
+  background: var(--white);
+  color: var(--cel-dark);
+  border: 1.5px solid var(--cel-mid);
+}
+.btn-outline:hover { background: var(--cel-pale); }
+.btn-gold {
+  background: var(--gold);
+  color: var(--white);
+}
+.btn-gold:hover { background: #d4891a; }
+.btn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+/* ── Main content ─────────────────────────────────────────── */
+.main {
+  flex: 1;
+  padding: 20px 24px;
+  overflow-y: auto;
+}
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+
+/* ── Stats row ────────────────────────────────────────────── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  box-shadow: 0 1px 3px rgba(46,109,180,.06);
+}
+.stat-card .label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.stat-card .value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1.1;
+}
+.stat-card .sub {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 2px;
+  font-style: italic;
+}
+.stat-card.good  .value { color: var(--success); }
+.stat-card.warn  .value { color: var(--warn); }
+.stat-card.alert .value { color: var(--danger); }
+.stat-card.cel   .value { color: var(--cel-dark); }
+
+/* ── Charts grid ──────────────────────────────────────────── */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.chart-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  box-shadow: 0 1px 3px rgba(46,109,180,.06);
+}
+.chart-card h4 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.chart-card.wide {
+  grid-column: 1 / -1;
+}
+.chart-wrap {
+  position: relative;
+  height: 200px;
+}
+.chart-wrap.tall { height: 260px; }
+
+/* ── Null model comparison ────────────────────────────────── */
+.null-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.null-label {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+  display: inline-block;
+}
+.null-label.active { background: var(--cel-pale); color: var(--cel-dark); }
+.null-label.null   { background: #f0f0f0; color: #666; }
+
+/* ── Sensitivity results ──────────────────────────────────── */
+.lhs-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.lhs-pct {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  text-align: center;
+}
+.lhs-pct .big { font-size: 32px; font-weight: 700; color: var(--cel-dark); }
+.lhs-pct .desc { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+/* ── Sobol bars ───────────────────────────────────────────── */
+.sobol-bar-wrap {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(46,109,180,.06);
+}
+.sobol-row {
+  margin-bottom: 14px;
+}
+.sobol-name {
+  font-size: 11px;
+  color: var(--text);
+  margin-bottom: 4px;
+  font-family: "Courier New", monospace;
+}
+.sobol-bars {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  height: 20px;
+}
+.sobol-s1 {
+  background: var(--cel-mid);
+  height: 20px;
+  border-radius: 3px 0 0 3px;
+  transition: width .4s ease;
+  position: relative;
+}
+.sobol-inter {
+  background: var(--gold);
+  height: 20px;
+  border-radius: 0 3px 3px 0;
+  transition: width .4s ease;
+}
+.sobol-legend {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 14px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.sobol-legend span { display: flex; align-items: center; gap: 5px; }
+.dot { width: 10px; height: 10px; border-radius: 2px; }
+
+/* ── ABC ──────────────────────────────────────────────────── */
+.abc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.abc-posterior {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+}
+.abc-posterior h5 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.abc-stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+.abc-stat-row:last-child { border: none; }
+.abc-stat-row strong { color: var(--navy); }
+
+/* ── Loading overlay ──────────────────────────────────────── */
+.loading {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,.85);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+}
+.loading.show { display: flex; }
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--cel-light);
+  border-top-color: var(--cel-mid);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading p { font-size: 13px; color: var(--muted); font-style: italic; }
+
+/* ── Status bar ───────────────────────────────────────────── */
+.statusbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--navy);
+  color: rgba(255,255,255,.7);
+  font-size: 10px;
+  padding: 4px 16px;
+  display: flex;
+  justify-content: space-between;
+  font-family: "Courier New", monospace;
+}
+.statusbar .ready { color: #74ACDF; }
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .charts-grid { grid-template-columns: 1fr; }
+  .null-grid   { grid-template-columns: 1fr; }
+  .abc-grid    { grid-template-columns: 1fr; }
+  .sidebar     { width: 220px; min-width: 220px; }
+}
+
+/* ── Section headings ─────────────────────────────────────── */
+.section-head {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--cel-light);
+}
+.note {
+  font-size: 11px;
+  color: var(--muted);
+  font-style: italic;
+  background: var(--cel-pale);
+  border-left: 3px solid var(--cel-mid);
+  padding: 8px 12px;
+  border-radius: 0 4px 4px 0;
+  margin-bottom: 16px;
+}
+</style>
+</head>
+<body>
+
+<div class="flag-stripe"></div>
+
+<!-- Top bar -->
+<div class="topbar">
+  <div class="topbar-title">
+    <h1>Neurobiological-Fitness Consequence Separation</h1>
+    <p>Ana Diez (2026) — Interactive Simulation Dashboard</p>
+  </div>
+  <div class="topbar-badge">DRAFT — not for distribution</div>
+</div>
+
+<!-- Tab navigation -->
+<div class="tabnav">
+  <button class="active" onclick="switchTab('sim',this)">Simulation</button>
+  <button onclick="switchTab('null',this)">Null Model</button>
+  <button onclick="switchTab('sens',this)">Sensitivity (LHS)</button>
+  <button onclick="switchTab('sobol',this)">Sobol</button>
+  <button onclick="switchTab('abc',this)">ABC</button>
+</div>
+
+<div class="layout">
+
+<!-- ── SIDEBAR ──────────────────────────────────────────────────────────── -->
+<aside class="sidebar">
+  <h3>Parameters</h3>
+
+  <div class="param-group">
+    <div class="param-label">
+      <span>Habituation rate</span>
+      <span class="val" id="v_hab">1.012</span>
+    </div>
+    <input type="range" id="s_hab" min="1.000" max="1.030" step="0.001" value="1.012"
+           oninput="document.getElementById('v_hab').textContent=parseFloat(this.value).toFixed(3)">
+    <div class="param-label"><code>base_habituation_rate</code></div>
+  </div>
+
+  <div class="param-group">
+    <div class="param-label">
+      <span>Status impulse sensitivity</span>
+      <span class="val" id="v_sip">0.30</span>
+    </div>
+    <input type="range" id="s_sip" min="0.05" max="1.00" step="0.01" value="0.30"
+           oninput="document.getElementById('v_sip').textContent=parseFloat(this.value).toFixed(2)">
+    <div class="param-label"><code>base_status_impulse_sensitivity</code></div>
+  </div>
+
+  <div class="param-group">
+    <div class="param-label">
+      <span>Anxiety → consumption</span>
+      <span class="val" id="v_scc">0.50</span>
+    </div>
+    <input type="range" id="s_scc" min="0.05" max="2.00" step="0.05" value="0.50"
+           oninput="document.getElementById('v_scc').textContent=parseFloat(this.value).toFixed(2)">
+    <div class="param-label"><code>status_consumption_conversion</code></div>
+  </div>
+
+  <div class="param-group">
+    <div class="param-label">
+      <span>Resource acquisition drive</span>
+      <span class="val" id="v_rad">0.008</span>
+    </div>
+    <input type="range" id="s_rad" min="0.002" max="0.04" step="0.001" value="0.008"
+           oninput="document.getElementById('v_rad').textContent=parseFloat(this.value).toFixed(3)">
+    <div class="param-label"><code>resource_acquisition_drive</code></div>
+  </div>
+
+  <div class="param-group">
+    <div class="param-label">
+      <span>Wellbeing prestige weight</span>
+      <span class="val" id="v_wpw">0.50</span>
+    </div>
+    <input type="range" id="s_wpw" min="0.00" max="1.00" step="0.05" value="0.50"
+           oninput="document.getElementById('v_wpw').textContent=parseFloat(this.value).toFixed(2)">
+    <div class="param-label"><code>wellbeing_prestige_weight</code></div>
+  </div>
+
+  <div class="param-group">
+    <div class="param-label">
+      <span>Info environment suppression</span>
+      <span class="val" id="v_inf">0.50</span>
+    </div>
+    <input type="range" id="s_inf" min="0.00" max="1.50" step="0.05" value="0.50"
+           oninput="document.getElementById('v_inf').textContent=parseFloat(this.value).toFixed(2)">
+    <div class="param-label"><code>info_suppression</code></div>
+  </div>
+
+  <div class="param-group">
+    <div class="param-label">
+      <span>Simulation ticks</span>
+      <span class="val" id="v_tks">300</span>
+    </div>
+    <input type="range" id="s_tks" min="54" max="300" step="1" value="300"
+           oninput="document.getElementById('v_tks').textContent=this.value">
+    <div class="param-label"><code>n_ticks (1 tick = 1 year)</code></div>
+  </div>
+
+  <hr class="sidebar-sep">
+
+  <button class="btn btn-primary" onclick="runSim()">Run Simulation</button>
+  <button class="btn btn-outline" onclick="resetParams()">Reset to Defaults</button>
+  <button class="btn btn-outline" onclick="exportCSV()">Export CSV</button>
+
+  <hr class="sidebar-sep">
+
+  <div style="font-size:10px;color:var(--muted);line-height:1.6;">
+    <strong style="color:var(--navy)">ABM specs:</strong><br>
+    100 agents · 8 rules · synchronous update<br>
+    1 tick = 1 year<br>
+    EOD empirical: 1970–2023
+  </div>
+</aside>
+
+<!-- ── MAIN ──────────────────────────────────────────────────────────────── -->
+<main class="main">
+
+  <!-- ═══ TAB: SIMULATION ═══════════════════════════════════════════════════ -->
+  <div id="tab-sim" class="tab-pane active">
+    <div class="stats-row" id="sim-stats">
+      <div class="stat-card cel">
+        <div class="label">Final EOD</div>
+        <div class="value" id="s-eod">—</div>
+        <div class="sub">day of year</div>
+      </div>
+      <div class="stat-card alert">
+        <div class="label">ABC RMSE (54y)</div>
+        <div class="value" id="s-rmse">—</div>
+        <div class="sub">days/year · Ana's: 5.64</div>
+      </div>
+      <div class="stat-card warn">
+        <div class="label">Consequence Sep.</div>
+        <div class="value" id="s-cs">—</div>
+        <div class="sub">final tick mean</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Repro. physiology</div>
+        <div class="value" id="s-rp">—</div>
+        <div class="sub">final · decline/yr</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Synaptic hab.</div>
+        <div class="value" id="s-sh">—</div>
+        <div class="sub">final mean</div>
+      </div>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-card wide">
+        <h4>Earth Overshoot Day — Simulated vs. Empirical (1970–2023)</h4>
+        <div class="chart-wrap tall"><canvas id="chart-eod"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h4>Consequence Separation over time</h4>
+        <div class="chart-wrap"><canvas id="chart-cs"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h4>Reproductive Physiology</h4>
+        <div class="chart-wrap"><canvas id="chart-rp"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h4>Dopamine Loop Closure vs. Real Satisfaction</h4>
+        <div class="chart-wrap"><canvas id="chart-dlc"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h4>Mean Consumption (biocapacity days/agent)</h4>
+        <div class="chart-wrap"><canvas id="chart-cons"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TAB: NULL MODEL ═══════════════════════════════════════════════════ -->
+  <div id="tab-null" class="tab-pane">
+    <h2 class="section-head">Null Model — Does the mechanism matter?</h2>
+    <div class="note">
+      The core thesis: temporal separation is <em>formally sufficient</em> to produce overshoot.
+      To test this, we run with <code>base_habituation_rate = 1.000</code> (no habituation growth,
+      no decoupling). If consequence separation disappears — the mechanism is necessary.
+    </div>
+
+    <div class="stats-row" style="margin-bottom:16px">
+      <div class="stat-card cel">
+        <div class="label">With mechanism — CS</div>
+        <div class="value" id="null-cs-active">—</div>
+        <div class="sub">consequence separation (final)</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Without mechanism — CS</div>
+        <div class="value" id="null-cs-null">—</div>
+        <div class="sub">hab_rate = 1.000 (null)</div>
+      </div>
+      <div class="stat-card cel">
+        <div class="label">With mechanism — EOD</div>
+        <div class="value" id="null-eod-active">—</div>
+        <div class="sub">final simulated EOD</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Without mechanism — EOD</div>
+        <div class="value" id="null-eod-null">—</div>
+        <div class="sub">null model EOD</div>
+      </div>
+    </div>
+
+    <button class="btn btn-gold" onclick="runNull()" style="max-width:240px;margin-bottom:20px">
+      Run Null Model Comparison
+    </button>
+
+    <div class="null-grid">
+      <div class="chart-card">
+        <div style="text-align:center;margin-bottom:10px">
+          <span class="null-label active">With mechanism (hab_rate = 1.012)</span>
+        </div>
+        <h4>Consequence Separation</h4>
+        <div class="chart-wrap"><canvas id="null-cs-chart-a"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div style="text-align:center;margin-bottom:10px">
+          <span class="null-label null">Without mechanism (hab_rate = 1.000)</span>
+        </div>
+        <h4>Consequence Separation</h4>
+        <div class="chart-wrap"><canvas id="null-cs-chart-b"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h4>EOD Trajectory — side by side</h4>
+        <div class="chart-wrap"><canvas id="null-eod-chart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h4>Reproductive Physiology — side by side</h4>
+        <div class="chart-wrap"><canvas id="null-rp-chart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TAB: SENSITIVITY ══════════════════════════════════════════════════ -->
+  <div id="tab-sens" class="tab-pane">
+    <h2 class="section-head">Latin Hypercube Sampling Sensitivity Analysis</h2>
+    <div class="note">
+      Parameters sampled across full plausible ranges via LHS.
+      Ana's paper: 500 simulations, 50 ticks.
+      This runs 120 samples (fast) — results should match qualitatively.
+    </div>
+
+    <button class="btn btn-primary" onclick="runSens()" style="max-width:220px;margin-bottom:20px">
+      Run LHS (120 samples)
+    </button>
+
+    <div class="lhs-summary" id="lhs-summary" style="display:none">
+      <div class="lhs-pct">
+        <div class="big" id="lhs-cs-pct">—</div>
+        <div class="desc">Consequence separation positive<br><em>Ana's paper: 100%</em></div>
+      </div>
+      <div class="lhs-pct">
+        <div class="big" id="lhs-eod-pct">—</div>
+        <div class="desc">Ecological overshoot (EOD &lt; Dec 31)<br><em>Ana's paper: 100%</em></div>
+      </div>
+      <div class="lhs-pct">
+        <div class="big" id="lhs-rp-pct">—</div>
+        <div class="desc">Reproductive physiology decline<br><em>Ana's paper: 97.6%</em></div>
+      </div>
+    </div>
+
+    <div class="charts-grid" id="sens-charts" style="display:none">
+      <div class="chart-card">
+        <h4>Consequence Separation — distribution across LHS runs</h4>
+        <div class="chart-wrap"><canvas id="lhs-cs-chart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h4>Reproductive Physiology — distribution across LHS runs</h4>
+        <div class="chart-wrap"><canvas id="lhs-rp-chart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TAB: SOBOL ════════════════════════════════════════════════════════ -->
+  <div id="tab-sobol" class="tab-pane">
+    <h2 class="section-head">Sobol Variance-Based Sensitivity Analysis</h2>
+    <div class="note">
+      First-order (S1) and total-order (ST) indices using the Saltelli 2002 estimator.
+      S1 = independent effect. ST−S1 = interaction effects.
+      Ana's paper: 3,584 evaluations (N=512). This uses N=64 for speed.
+    </div>
+
+    <button class="btn btn-primary" onclick="runSobol()" style="max-width:220px;margin-bottom:20px">
+      Run Sobol (N=64 base)
+    </button>
+
+    <div id="sobol-results" style="display:none">
+      <div class="sobol-bar-wrap">
+        <h4 style="font-size:12px;color:var(--navy);margin-bottom:14px">
+          Output variable: consequence_separation at final tick
+        </h4>
+        <div class="sobol-legend">
+          <span><span class="dot" style="background:var(--cel-mid)"></span>S1 (independent effect)</span>
+          <span><span class="dot" style="background:var(--gold)"></span>ST−S1 (interaction effect)</span>
+        </div>
+        <div id="sobol-bars"></div>
+      </div>
+
+      <div class="stats-row" style="margin-top:16px" id="sobol-stats"></div>
+
+      <div class="chart-card" style="margin-top:16px">
+        <h4>S1 vs ST — comparison chart</h4>
+        <div class="chart-wrap"><canvas id="sobol-chart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TAB: ABC ══════════════════════════════════════════════════════════ -->
+  <div id="tab-abc" class="tab-pane">
+    <h2 class="section-head">Approximate Bayesian Computation — Parameter Estimation</h2>
+    <div class="note">
+      Rejection ABC fitting to Earth Overshoot Day trajectory 1970–2023.
+      Ana's paper: 2,000 simulations, 5th percentile rejection, RMSE = 5.64 days.
+      This runs 200 simulations (fast). Results should be comparable.
+    </div>
+
+    <button class="btn btn-primary" onclick="runABC()" style="max-width:220px;margin-bottom:20px">
+      Run ABC (200 simulations)
+    </button>
+
+    <div id="abc-results" style="display:none">
+      <div class="stats-row">
+        <div class="stat-card cel">
+          <div class="label">Accepted simulations</div>
+          <div class="value" id="abc-n-acc">—</div>
+          <div class="sub">of total simulated</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Best-fit RMSE</div>
+          <div class="value" id="abc-rmse">—</div>
+          <div class="sub">days · Ana's paper: 5.64</div>
+        </div>
+      </div>
+
+      <div class="abc-grid" id="abc-posteriors"></div>
+
+      <div class="chart-card" style="margin-top:16px">
+        <h4>RMSE distribution across all simulations</h4>
+        <div class="chart-wrap"><canvas id="abc-rmse-chart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div><!-- /layout -->
+
+<!-- Loading overlay -->
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  <p id="loading-msg">Running simulation…</p>
+</div>
+
+<!-- Status bar -->
+<div class="statusbar">
+  <span id="status-left">Ready</span>
+  <span class="ready">http://localhost:8765</span>
+</div>
+
+<!-- ─────────────────────────────────────────────────────────────────────── -->
+<script>
+// ── Chart registry ─────────────────────────────────────────────────────────
+const charts = {};
+function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
+
+const CEL    = "#4A90D9";
+const GOLD   = "#F5A623";
+const NAVY   = "#1A3A5C";
+const RED    = "#C0392B";
+const GREEN  = "#27AE60";
+const GREY   = "#AABBC8";
+const CEL_A  = "rgba(74,144,217,.15)";
+const GOLD_A = "rgba(245,166,35,.25)";
+
+const baseOptions = (yLabel="") => ({
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { labels: { font: { family: "Palatino Linotype", size: 11 },
+                         color: "#5A7A9A", boxWidth: 12, padding: 12 } },
+    tooltip: { bodyFont: { family: "Palatino Linotype", size: 11 } }
+  },
+  scales: {
+    x: {
+      ticks: { font: { family: "Palatino Linotype", size: 10 }, color: "#5A7A9A",
+               maxTicksLimit: 12 },
+      grid: { color: "rgba(100,150,200,.12)" }
+    },
+    y: {
+      title: { display: !!yLabel, text: yLabel,
+               font: { family: "Palatino Linotype", size: 10 }, color: "#5A7A9A" },
+      ticks: { font: { family: "Palatino Linotype", size: 10 }, color: "#5A7A9A" },
+      grid: { color: "rgba(100,150,200,.12)" }
+    }
+  }
+});
+
+// ── Tab switching ───────────────────────────────────────────────────────────
+function switchTab(name, btn) {
+  document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".tabnav button").forEach(b => b.classList.remove("active"));
+  document.getElementById("tab-" + name).classList.add("active");
+  btn.classList.add("active");
+}
+
+// ── Get params from sliders ─────────────────────────────────────────────────
+function getParams() {
+  return {
+    base_habituation_rate:           parseFloat(document.getElementById("s_hab").value),
+    base_status_impulse_sensitivity: parseFloat(document.getElementById("s_sip").value),
+    status_consumption_conversion:   parseFloat(document.getElementById("s_scc").value),
+    resource_acquisition_drive:      parseFloat(document.getElementById("s_rad").value),
+    wellbeing_prestige_weight:       parseFloat(document.getElementById("s_wpw").value),
+    info_suppression:                parseFloat(document.getElementById("s_inf").value),
+    n_ticks:                         parseInt(document.getElementById("s_tks").value),
+  };
+}
+
+function resetParams() {
+  const defs = {s_hab:"1.012",s_sip:"0.30",s_scc:"0.50",
+                 s_rad:"0.008",s_wpw:"0.50",s_inf:"0.50",s_tks:"300"};
+  const labels = {s_hab:"v_hab",s_sip:"v_sip",s_scc:"v_scc",
+                   s_rad:"v_rad",s_wpw:"v_wpw",s_inf:"v_inf",s_tks:"v_tks"};
+  Object.entries(defs).forEach(([id, val]) => {
+    document.getElementById(id).value = val;
+    const lbl = document.getElementById(labels[id]);
+    if (lbl) lbl.textContent = val;
+  });
+}
+
+// ── Loading helper ──────────────────────────────────────────────────────────
+function setLoading(msg) {
+  document.getElementById("loading").classList.add("show");
+  document.getElementById("loading-msg").textContent = msg;
+}
+function clearLoading() { document.getElementById("loading").classList.remove("show"); }
+function setStatus(msg) { document.getElementById("status-left").textContent = msg; }
+
+// ── POST helper ─────────────────────────────────────────────────────────────
+async function post(endpoint, body={}) {
+  const res = await fetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  SIMULATION TAB
+// ═══════════════════════════════════════════════════════════════════════════
+async function runSim() {
+  setLoading("Running ABM simulation…");
+  setStatus("Running…");
+  try {
+    const data = await post("/run", { params: getParams() });
+    renderSim(data);
+    setStatus(`Done — RMSE ${data.stats.abc_rmse_54ticks} days · CS ${data.stats.final_cs}`);
+  } catch(e) {
+    alert("Error: " + e.message);
+    setStatus("Error");
+  }
+  clearLoading();
+}
+
+function renderSim(d) {
+  const s = d.stats;
+  document.getElementById("s-eod").textContent  = Math.round(d.eod[d.eod.length-1]);
+  document.getElementById("s-rmse").textContent = s.abc_rmse_54ticks.toFixed(2);
+  document.getElementById("s-cs").textContent   = s.final_cs.toFixed(3);
+  document.getElementById("s-rp").textContent   = s.final_repro.toFixed(3);
+  document.getElementById("s-sh").textContent   = s.final_sh.toFixed(3);
+
+  const labels = d.year;
+  const emp54  = d.year.map((y,i) => d.eod_empirical[i]);
+
+  // ── EOD chart ────────────────────────────────────────────────────────────
+  destroyChart("eod");
+  charts.eod = new Chart(document.getElementById("chart-eod"), {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        { label: "Simulated EOD", data: d.eod,
+          borderColor: CEL, backgroundColor: "transparent",
+          borderWidth: 2, pointRadius: 0, tension: .3 },
+        { label: "Empirical EOD (GFN)", data: emp54,
+          borderColor: GREY, backgroundColor: "transparent",
+          borderWidth: 1.5, borderDash: [5,3], pointRadius: 0 },
+      ]
+    },
+    options: { ...baseOptions("day of year"),
+      scales: { ...baseOptions().scales,
+        y: { ...baseOptions().scales.y, reverse: false,
+             title: { display: true, text: "Earth Overshoot Day (day of year)" } } } }
+  });
+
+  // ── Consequence separation ────────────────────────────────────────────────
+  destroyChart("cs");
+  charts.cs = new Chart(document.getElementById("chart-cs"), {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        { label: "CS mean",  data: d.cs_mean,
+          borderColor: CEL, backgroundColor: CEL_A,
+          fill: "origin", borderWidth: 2, pointRadius: 0, tension: .3 },
+        { label: "CS IQR",  data: d.cs_p75,
+          borderColor: "transparent", backgroundColor: CEL_A,
+          fill: "+1", borderWidth: 0, pointRadius: 0 },
+        { label: "CS p25",  data: d.cs_p25,
+          borderColor: "transparent", backgroundColor: CEL_A,
+          fill: false, borderWidth: 0, pointRadius: 0 },
+      ]
+    },
+    options: baseOptions("consequence_separation")
+  });
+
+  // ── Reproductive physiology ───────────────────────────────────────────────
+  destroyChart("rp");
+  charts.rp = new Chart(document.getElementById("chart-rp"), {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        { label: "Mean", data: d.repro_mean,
+          borderColor: GOLD, backgroundColor: GOLD_A,
+          fill: "origin", borderWidth: 2, pointRadius: 0, tension: .3 },
+      ]
+    },
+    options: baseOptions("reproductive_physiology")
+  });
+
+  // ── DLC vs RSR ────────────────────────────────────────────────────────────
+  destroyChart("dlc");
+  charts.dlc = new Chart(document.getElementById("chart-dlc"), {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        { label: "Dopamine loop closure", data: d.dlc_mean,
+          borderColor: CEL, borderWidth: 2, pointRadius: 0, tension: .3 },
+        { label: "Real satisfaction (RSR)", data: d.rsr,
+          borderColor: GREEN, borderWidth: 2, pointRadius: 0,
+          borderDash: [4,3] },
+      ]
+    },
+    options: baseOptions("reward signal")
+  });
+
+  // ── Consumption ───────────────────────────────────────────────────────────
+  destroyChart("cons");
+  charts.cons = new Chart(document.getElementById("chart-cons"), {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        { label: "Mean consumption (biocap-days)", data: d.mean_consumption,
+          borderColor: NAVY, borderWidth: 2, pointRadius: 0, tension: .3 },
+        { label: "1 Earth (365)", data: d.year.map(() => 365),
+          borderColor: RED, borderWidth: 1, borderDash: [4,3], pointRadius: 0 },
+      ]
+    },
+    options: baseOptions("biocapacity days/agent")
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  NULL MODEL TAB
+// ═══════════════════════════════════════════════════════════════════════════
+let nullData = null;
+let activeData = null;
+
+async function runNull() {
+  setLoading("Running null model comparison…");
+  const params = getParams();
+  params.n_ticks = 150;
+  try {
+    const [active, nullm] = await Promise.all([
+      post("/run",      { params }),
+      post("/run_null", { params }),
+    ]);
+    activeData = active;
+    nullData   = nullm;
+    renderNull(active, nullm);
+    setStatus("Null model done");
+  } catch(e) {
+    alert("Error: " + e.message);
+  }
+  clearLoading();
+}
+
+function renderNull(a, n) {
+  document.getElementById("null-cs-active").textContent  = a.stats.final_cs.toFixed(3);
+  document.getElementById("null-cs-null").textContent    = n.stats.final_cs.toFixed(3);
+  document.getElementById("null-eod-active").textContent = Math.round(a.eod[a.eod.length-1]);
+  document.getElementById("null-eod-null").textContent   = Math.round(n.eod[n.eod.length-1]);
+
+  const yrs = a.year;
+
+  destroyChart("null-cs-a");
+  charts["null-cs-a"] = new Chart(document.getElementById("null-cs-chart-a"), {
+    type: "line",
+    data: { labels: yrs, datasets: [{
+      label: "CS (with mechanism)", data: a.cs_mean,
+      borderColor: CEL, backgroundColor: CEL_A, fill: "origin",
+      borderWidth: 2, pointRadius: 0, tension: .3
+    }]},
+    options: baseOptions("consequence_separation")
+  });
+
+  destroyChart("null-cs-b");
+  charts["null-cs-b"] = new Chart(document.getElementById("null-cs-chart-b"), {
+    type: "line",
+    data: { labels: yrs, datasets: [{
+      label: "CS (null — no habituation)", data: n.cs_mean,
+      borderColor: GREY, backgroundColor: "rgba(170,187,200,.15)", fill: "origin",
+      borderWidth: 2, pointRadius: 0, tension: .3
+    }]},
+    options: baseOptions("consequence_separation")
+  });
+
+  destroyChart("null-eod");
+  charts["null-eod"] = new Chart(document.getElementById("null-eod-chart"), {
+    type: "line",
+    data: { labels: yrs, datasets: [
+      { label: "With mechanism", data: a.eod,
+        borderColor: CEL, borderWidth: 2, pointRadius: 0, tension: .3 },
+      { label: "Null model",     data: n.eod,
+        borderColor: GREY, borderWidth: 2, borderDash: [5,3],
+        pointRadius: 0, tension: .3 },
+    ]},
+    options: baseOptions("EOD (day of year)")
+  });
+
+  destroyChart("null-rp");
+  charts["null-rp"] = new Chart(document.getElementById("null-rp-chart"), {
+    type: "line",
+    data: { labels: yrs, datasets: [
+      { label: "With mechanism", data: a.repro_mean,
+        borderColor: GOLD, borderWidth: 2, pointRadius: 0, tension: .3 },
+      { label: "Null model",     data: n.repro_mean,
+        borderColor: GREY, borderWidth: 2, borderDash: [5,3],
+        pointRadius: 0, tension: .3 },
+    ]},
+    options: baseOptions("reproductive_physiology")
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  SENSITIVITY TAB
+// ═══════════════════════════════════════════════════════════════════════════
+async function runSens() {
+  setLoading("Running LHS sensitivity analysis (120 samples)…");
+  try {
+    const data = await post("/sensitivity", { n_samples: 120, n_ticks: 50 });
+    renderSens(data);
+    setStatus(`LHS done — ${data.n_samples} samples`);
+  } catch(e) {
+    alert("Error: " + e.message);
+  }
+  clearLoading();
+}
+
+function renderSens(d) {
+  document.getElementById("lhs-summary").style.display = "grid";
+  document.getElementById("sens-charts").style.display = "grid";
+  document.getElementById("lhs-cs-pct").textContent  = d.pct_cs_positive + "%";
+  document.getElementById("lhs-eod-pct").textContent = d.pct_overshoot + "%";
+  document.getElementById("lhs-rp-pct").textContent  = d.pct_repro_decline + "%";
+
+  const bins = 20;
+  function histogram(vals, n) {
+    const mn = Math.min(...vals), mx = Math.max(...vals);
+    const w = (mx - mn) / n;
+    const counts = Array(n).fill(0);
+    const labels = [];
+    for (let i = 0; i < n; i++) labels.push((mn + w*i).toFixed(3));
+    for (const v of vals) {
+      const idx = Math.min(n-1, Math.floor((v - mn) / w));
+      counts[idx]++;
+    }
+    return { labels, counts };
+  }
+
+  const csH = histogram(d.cs_distribution, bins);
+  destroyChart("lhs-cs");
+  charts["lhs-cs"] = new Chart(document.getElementById("lhs-cs-chart"), {
+    type: "bar",
+    data: { labels: csH.labels, datasets: [{
+      label: "Count", data: csH.counts,
+      backgroundColor: CEL_A, borderColor: CEL, borderWidth: 1
+    }]},
+    options: { ...baseOptions("count"), plugins: { legend: { display: false } } }
+  });
+
+  const rpH = histogram(d.repro_distribution, bins);
+  destroyChart("lhs-rp");
+  charts["lhs-rp"] = new Chart(document.getElementById("lhs-rp-chart"), {
+    type: "bar",
+    data: { labels: rpH.labels, datasets: [{
+      label: "Count", data: rpH.counts,
+      backgroundColor: GOLD_A, borderColor: GOLD, borderWidth: 1
+    }]},
+    options: { ...baseOptions("count"), plugins: { legend: { display: false } } }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  SOBOL TAB
+// ═══════════════════════════════════════════════════════════════════════════
+const PARAM_LABELS = {
+  "base_status_impulse_sensitivity": "Status impulse sensitivity",
+  "status_consumption_conversion":   "Status anxiety → consumption",
+  "base_habituation_rate":           "Synaptic habituation rate",
+  "resource_acquisition_drive":      "Resource acquisition drive",
+  "cultural_selection_rate":         "Cultural selection rate",
+};
+
+async function runSobol() {
+  setLoading("Running Sobol analysis (64 base samples)…");
+  try {
+    const data = await post("/sobol", { n_base: 64, n_ticks: 50 });
+    renderSobol(data);
+    setStatus(`Sobol done — ${data.n_evaluations} evaluations`);
+  } catch(e) {
+    alert("Error: " + e.message);
+  }
+  clearLoading();
+}
+
+function renderSobol(d) {
+  document.getElementById("sobol-results").style.display = "block";
+  const MAX = 180; // max bar px width
+
+  const barsEl = document.getElementById("sobol-bars");
+  barsEl.innerHTML = "";
+  const maxST = Math.max(...d.param_names.map(k => d.ST[k]), 0.01);
+
+  d.param_names.forEach(key => {
+    const s1  = d.S1[key];
+    const st  = d.ST[key];
+    const int = Math.max(0, st - s1);
+    const pxS1  = Math.round((s1  / maxST) * MAX);
+    const pxInt = Math.round((int / maxST) * MAX);
+
+    const row = document.createElement("div");
+    row.className = "sobol-row";
+    row.innerHTML = `
+      <div class="sobol-name">${PARAM_LABELS[key] || key}</div>
+      <div class="sobol-bars">
+        <div class="sobol-s1"  style="width:${pxS1}px"></div>
+        <div class="sobol-inter" style="width:${pxInt}px"></div>
+        <span style="font-size:10px;color:var(--muted);margin-left:6px">
+          S1=${s1.toFixed(3)} · ST=${st.toFixed(3)} · interaction=${int.toFixed(3)}
+        </span>
+      </div>`;
+    barsEl.appendChild(row);
+  });
+
+  destroyChart("sobol");
+  charts["sobol"] = new Chart(document.getElementById("sobol-chart"), {
+    type: "bar",
+    data: {
+      labels: d.param_names.map(k => PARAM_LABELS[k] || k),
+      datasets: [
+        { label: "S1 (independent)", data: d.param_names.map(k => d.S1[k]),
+          backgroundColor: CEL, borderRadius: 3 },
+        { label: "ST (total)",       data: d.param_names.map(k => d.ST[k]),
+          backgroundColor: GOLD, borderRadius: 3 },
+      ]
+    },
+    options: {
+      ...baseOptions("Sobol index"),
+      indexAxis: "y",
+      plugins: { ...baseOptions().plugins,
+        legend: { ...baseOptions().plugins.legend, position: "top" } }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  ABC TAB
+// ═══════════════════════════════════════════════════════════════════════════
+async function runABC() {
+  setLoading("Running ABC (200 simulations × EOD trajectory)…\nThis takes ~30 seconds.");
+  try {
+    const data = await post("/abc", { n_sims: 200, acceptance_pct: 5 });
+    renderABC(data);
+    setStatus(`ABC done — best RMSE ${data.best_rmse} days · ${data.n_accepted} accepted`);
+  } catch(e) {
+    alert("Error: " + e.message);
+  }
+  clearLoading();
+}
+
+const ABC_LABELS = {
+  "base_habituation_rate":           "base_habituation_rate",
+  "base_status_impulse_sensitivity": "base_status_impulse_sensitivity",
+  "status_consumption_conversion":   "status_consumption_conversion",
+};
+
+function renderABC(d) {
+  document.getElementById("abc-results").style.display = "block";
+  document.getElementById("abc-n-acc").textContent =
+    `${d.n_accepted} / ${d.n_simulations}`;
+  document.getElementById("abc-rmse").textContent = d.best_rmse.toFixed(2);
+
+  const postsEl = document.getElementById("abc-posteriors");
+  postsEl.innerHTML = "";
+  d.param_names.forEach(key => {
+    const p = d.posteriors[key];
+    const card = document.createElement("div");
+    card.className = "abc-posterior";
+    card.innerHTML = `
+      <h5>${ABC_LABELS[key] || key}</h5>
+      <div class="abc-stat-row"><span>Posterior mean</span><strong>${p.mean.toFixed(5)}</strong></div>
+      <div class="abc-stat-row"><span>Posterior std</span><strong>${p.std.toFixed(5)}</strong></div>
+      <div class="abc-stat-row"><span>95% CI</span>
+        <strong>${p.ci_lo.toFixed(4)} – ${p.ci_hi.toFixed(4)}</strong></div>
+      <div class="abc-stat-row"><span>Ana's paper CI</span>
+        <strong>${key==="base_habituation_rate" ? "1.005 – 1.020" : "spans prior"}</strong></div>
+    `;
+    postsEl.appendChild(card);
+  });
+
+  const bins = 15;
+  const rmseVals = d.all_rmse;
+  const mn = Math.min(...rmseVals), mx = Math.max(...rmseVals);
+  const w = (mx - mn) / bins;
+  const counts = Array(bins).fill(0);
+  const lbls = [];
+  for (let i = 0; i < bins; i++) lbls.push((mn + w*i).toFixed(1));
+  for (const v of rmseVals) {
+    const idx = Math.min(bins-1, Math.floor((v - mn) / w));
+    counts[idx]++;
+  }
+  const accept_rmse = d.all_rmse[d.n_accepted - 1];
+
+  destroyChart("abc-rmse");
+  charts["abc-rmse"] = new Chart(document.getElementById("abc-rmse-chart"), {
+    type: "bar",
+    data: { labels: lbls, datasets: [{
+      label: "# simulations", data: counts,
+      backgroundColor: lbls.map((l,i) =>
+        (mn + w*i) <= accept_rmse ? CEL_A : "rgba(200,200,200,.3)"),
+      borderColor: lbls.map((l,i) =>
+        (mn + w*i) <= accept_rmse ? CEL : "#ccc"),
+      borderWidth: 1
+    }]},
+    options: {
+      ...baseOptions("count"),
+      plugins: { legend: { display: false },
+        tooltip: { callbacks: { title: l => `RMSE ≈ ${l[0].label} days` } } }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  EXPORT
+// ═══════════════════════════════════════════════════════════════════════════
+async function exportCSV() {
+  setLoading("Exporting CSV…");
+  try {
+    const res = await fetch("/export", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ params: getParams() })
+    });
+    const blob = await res.blob();
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href = url;
+    a.download = "ana_diez_simulation.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch(e) { alert("Error: " + e.message); }
+  clearLoading();
+}
+
+// ── Auto-run on load ────────────────────────────────────────────────────────
+window.addEventListener("load", () => { runSim(); });
+</script>
+</body>
+</html>
