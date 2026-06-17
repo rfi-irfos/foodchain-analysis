@@ -1,10 +1,11 @@
 # Neurobiological-Fitness Consequence Separation
 
-**Research by [Ana Diez](https://github.com/aiqueenofaustria) — Head of Research & Wellbeing, RFI-IRFOS**
+**Research by [Ana Diez](https://github.com/anadiezmartini),  RFI-IRFOS**
 
-[Live Tool](https://rfi-irfos.github.io/foodchain-analysis/) | [Whitepaper (PDF)](Ana%20Diez%20-%20Neurobiological-Fitness%20Consequence%20Separation.pdf) | [RFI-IRFOS](https://ternlang.com)
+(https://rfi-irfos.github.io/foodchain-analysis/) | [Whitepaper (PDF)](Ana%20Diez%20-%20Neurobiological-Fitness%20Consequence%20Separation.pdf) | [RFI-IRFOS](https://ternlang.com)
 
 ---
+<img width="1854" height="929" alt="image" src="https://github.com/user-attachments/assets/63c2c9f1-48f9-40c1-9336-6f6742f2bb82" />
 
 ## What This Is
 
@@ -42,7 +43,7 @@ Key finding: after accounting for post-harvest loss, processing waste, and acces
 
 ## Using the Tool
 
-The [live dashboard](https://rfi-irfos.github.io/foodchain-analysis/) runs entirely in your browser. No backend, no signup.
+The live dashboard runs entirely in your browser. No backend, no signup.
 
 You can:
 - Run the simulation with custom parameters
