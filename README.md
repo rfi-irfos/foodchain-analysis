@@ -103,10 +103,6 @@ Regulated not-for-profit. Surplus reinvested into research and public tools.
 
 This work is released under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). You are free to share, adapt, and build on it with attribution.
 
-If you use this work in academic or policy contexts, please cite:
-
-> Diez, A. (2026). *Neurobiological-Fitness Consequence Separation: An Agent-Based Analysis of Structural Food Scarcity*. RFI-IRFOS. https://github.com/rfi-irfos/foodchain-analysis
-
 ---
 
 *Published by RFI-IRFOS — ternlang.com*
