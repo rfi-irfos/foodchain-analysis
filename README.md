@@ -1,9 +1,5 @@
 # Neurobiological-Fitness Consequence Separation
 
-**Research by [Ana Diez](https://github.com/anadiezmartini),  RFI-IRFOS**
-
-(https://rfi-irfos.github.io/foodchain-analysis/) | [Whitepaper (PDF)](Ana%20Diez%20-%20Neurobiological-Fitness%20Consequence%20Separation.pdf) | [RFI-IRFOS](https://ternlang.com)
-
 ---
 <img width="1854" height="929" alt="image" src="https://github.com/user-attachments/assets/63c2c9f1-48f9-40c1-9336-6f6742f2bb82" />
 
